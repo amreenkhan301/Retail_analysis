@@ -1,29 +1,51 @@
 pipeline {
     agent any
     
+    environment {
+        LABS = credentials('multi-lab-cluster')
+        JAVA_HOME = '/opt/bitnami/java'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+    }
+    
     stages {
-        stage('Build') {
+        stage('Setup Virtual Environment') {
             steps {
-                echo "build completed successfully"
+                script {
+                    sh 'python3 -m venv retail_pipeline_venv'
+                    sh './retail_pipeline_venv/bin/pip install --upgrade pip'
+                    sh './retail_pipeline_venv/bin/pip install pipenv'
                 }
             }
-                
-                stage('Test') {
-                    steps {
-                        echo "test completed successfully"
-                        }
-                    }
-                        
-                        stage('Package') {
-                            steps {
-                                echo "package completed successfully"
-                                }
-                            }
-                                
-                                stage('Deploy') {
-                                    steps {
-                                        echo "deploy completed successfully"
-                                    }
-                                }
-                            }
-                        }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh './retail_pipeline_venv/bin/pipenv install'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    sh 'echo $JAVA_HOME'
+                    sh 'echo $PATH'
+                    sh './retail_pipeline_venv/bin/pipenv run pytest'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'zip -r retailproject.zip . -x "retail_pipeline_venv/*"'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'sshpass -p $LABS_PSW scp -o StrictHostKeyChecking=no -r retailproject.zip $LABS_USR@g02.itversity.com:/home/itv022789/retailproject'
+            }
+        }
+    }
+}
