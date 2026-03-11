@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        LABS = credentials('multi-lab-cluster')
+        LABS = credentials('labcreds')
         JAVA_HOME = '/opt/bitnami/java'
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
