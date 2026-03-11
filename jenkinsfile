@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        LABS = credentials('multi-lab-cluster')
-        JAVA_HOME = '/opt/bitnami/java'
+        LABS = credentials('labcreds')
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
     
