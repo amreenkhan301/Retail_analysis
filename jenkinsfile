@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         LABS = credentials('multi-lab-cluster')
-        JAVA_HOME = '/opt/bitnami/java'
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
     
